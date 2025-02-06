@@ -16,7 +16,7 @@ import random
 admin_id = 6897739611  # Replace with your admin ID
 Notification= -1002366008044 #replace with channel id where user notification will be sent 
 monitor=-1002258177872 #replace with channel id where all the python files will sent 
-bot_token = "8110572758:AAFll_XMXFLdJHQ6JZn6IX5vhbXNH7mukzU"
+bot_token = "8110572758:AAEdsjM1gM1H1K8juax_6ngNEc23AIjwiDc"
 bot = telebot.TeleBot(bot_token)
 
 mongo_url = "mongodb+srv://botplays90:botplays90@botplays.ycka9.mongodb.net/?retryWrites=true&w=majority&appName=botplays"
