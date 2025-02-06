@@ -161,7 +161,7 @@ def create_inline_keyboard():
 
 def add_owner_button(keyboard):
     owner_button = InlineKeyboardButton("👤 Developer", url="https://t.me/botplays90")
-    join_channel_button = InlineKeyboardButton("♻️ Join-Channel", url="https://t.me/your_channel_username")  # Replace with your channel URL
+    join_channel_button = InlineKeyboardButton("♻️ Join-Channel", url="https://t.me/join_hyponet")  # Replace with your channel URL
     keyboard.add(owner_button, join_channel_button)
     return keyboard
 
