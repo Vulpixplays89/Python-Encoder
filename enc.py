@@ -60,7 +60,7 @@ b64 = lambda in_: base64.b64encode(in_)
 mar = lambda in_: marshal.dumps(compile(in_, '<x>', 'exec'))
 
 note = (
-    "# Obfuscated by the Botpalys encoder\n"
+    "# Obfuscated by the Botpalys encoder\n Bot Username @pythonEncoderbybot\n"
     "#Time: %s\n" % time.ctime()
 )
 
@@ -165,7 +165,7 @@ def create_inline_keyboard():
 
 def add_owner_button(keyboard):
     owner_button = InlineKeyboardButton("👤 Developer", url="https://t.me/botplays90")
-    join_channel_button = InlineKeyboardButton("♻️ Join-Channel", url="https://t.me/your_channel_username")  # Replace with your channel URL
+    join_channel_button = InlineKeyboardButton("♻️ Join-Channel", url="https://t.me/join_hyponet")  # Replace with your channel URL
     keyboard.add(owner_button, join_channel_button)
     return keyboard
 
