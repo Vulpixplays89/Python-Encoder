@@ -59,7 +59,7 @@ b64 = lambda in_: base64.b64encode(in_)
 mar = lambda in_: marshal.dumps(compile(in_, '<x>', 'exec'))
 
 note = (
-    "# Obfuscated by the @botplays90 encoder\n Bot Username@pythonEncoderbybot \n"
+    "# Obfuscated by the @botplays90 encoder\n #Bot Username@pythonEncoderbybot \n"
     "#Time: %s\n" % time.ctime()
 )
 
