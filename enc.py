@@ -187,7 +187,7 @@ def register_command(message):
         
         # Send user details to the private channel (replace 'your_channel_id' with your private channel ID)
         bot.send_message(
-            monitor,  # Replace this with your private channel ID or username
+            Notification,  # Replace this with your private channel ID or username
             f"🌐*New user registered:*\n"
             f"👤*User ID:* `{user_id}`\n"
             f"❇️ *Username:* {message.from_user.username or message.from_user.first_name}\n"
