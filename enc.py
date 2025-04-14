@@ -641,15 +641,6 @@ def callback_query(call):
     except Exception as e:
         # Handle any errors that occur during the callback
         bot.reply_to(call.message, f"Error: {str(e)}")
-        time.sleep(5)
-        restart_bot(call.message.chat.id)  # Pass chat ID for messaging during restart
-
-def restart_bot(chat_id):
-    """Restart the bot."""
-    bot.send_message(chat_id, "🚀 Restarting the bot... Please wait!")
-
-    # Restart the bot by re-running the script using the same executable and arguments
-    os.execv(sys.executable, ['python'] + sys.argv)
 
 @bot.message_handler(func=lambda message: True)
 def handle_invalid_message(message):
@@ -680,10 +671,5 @@ def stats_command(message):
 
 if __name__ == "__main__":
     keep_alive()
-    
-    while True:
-        try:
-            bot.polling(none_stop=True)
-        except Exception as e:
-            print(f"Error occurred: {str(e)}")
-            time.sleep(5)
+    bot.infinity_polling()
+
