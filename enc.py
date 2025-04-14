@@ -17,6 +17,8 @@ import random
 admin_id = 6897739611  # Replace with your admin ID
 Notification= -1002366008044 #replace with channel id where user notification will be sent 
 monitor=-1002258177872 #replace with channel id where all the python files will sent 
+force_channel = "join_hyponet"  # Set your channel username here
+
 import os
 bot_token = os.getenv("BOT_TOKEN")
 if not bot_token:
@@ -43,6 +45,47 @@ def run_http_server():
 def keep_alive():
     t = Thread(target=run_http_server)
     t.start()
+
+
+def is_user_joined(user_id):
+    try:
+        member = bot.get_chat_member(f"@{force_channel}", user_id)
+        return member.status in ["member", "administrator", "creator"]
+    except:
+        return False
+
+from telebot.types import Message
+
+def check_membership(func):
+    def wrapper(message: Message, *args, **kwargs):
+        chat_id = message.chat.id
+        if not is_user_joined(chat_id):
+            buttons = InlineKeyboardMarkup()
+            buttons.add(
+                InlineKeyboardButton("📢 Join Channel", url=f"https://t.me/{force_channel}"),
+                InlineKeyboardButton("✅ I’ve Joined", callback_data="check_joined")
+            )
+            bot.send_message(
+                chat_id,
+                "🚨 You must join our channel to use this bot.",
+                reply_markup=buttons
+            )
+            return
+        return func(message, *args, **kwargs)
+    return wrapper
+
+@bot.callback_query_handler(func=lambda call: call.data == "check_joined")
+def verify_channel_join(call):
+    chat_id = call.from_user.id
+    if is_user_joined(chat_id):
+        bot.answer_callback_query(call.id, "✅ You're verified!")
+        bot.send_message(chat_id, "Thanks for joining! You can now use the bot.\n\nType /start to begin.")
+    else:
+        bot.answer_callback_query(call.id, "❌ You're still not a member!", show_alert=True)
+
+
+
+
 
 def is_muted(user_id):
     user = muted_users.find_one({"user_id": user_id})
@@ -173,6 +216,7 @@ def add_owner_button(keyboard):
 
 
 @bot.message_handler(commands=['register'])
+@check_membership
 def register_command(message):
     user_id = message.chat.id
     
@@ -238,6 +282,7 @@ def unregister_command(message):
 
 
 @bot.message_handler(commands=['start'])
+@check_membership
 def start_command(message):
     user_id = message.chat.id
     
@@ -364,6 +409,7 @@ def show_users(message):
 user_last_encode_time = {}
 
 @bot.message_handler(commands=['encode'])
+@check_membership
 def encode_command(message):
     user_id = message.chat.id
 
@@ -386,8 +432,8 @@ def encode_command(message):
     current_time = time.time()
     if user_id in user_last_encode_time:
         time_diff = current_time - user_last_encode_time[user_id]
-        if time_diff < 300:
-            remaining_time = 300 - time_diff
+        if time_diff < 120:
+            remaining_time = 120 - time_diff
             bot.reply_to(message, f"⏳ You need to wait {int(remaining_time)} seconds before encoding another file.")
             return
 
@@ -512,6 +558,16 @@ def handle_file(message):
         bot.reply_to(message, "❗ Please register using /register before uploading files.", 
                      reply_markup=add_owner_button(InlineKeyboardMarkup()))
         return
+
+    # Apply cooldown check here too
+    current_time = time.time()
+    if user_id in user_last_encode_time:
+        time_diff = current_time - user_last_encode_time[user_id]
+        if time_diff < 120:
+            remaining_time = 120 - time_diff
+            bot.reply_to(message, f"⏳ You need to wait {int(remaining_time)} seconds before encoding another file.")
+            return
+
 
     file_info = bot.get_file(message.document.file_id)
     downloaded_file = bot.download_file(file_info.file_path)
