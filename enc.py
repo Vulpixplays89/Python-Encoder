@@ -547,6 +547,7 @@ def handle_mute_callback(call):
         bot.answer_callback_query(call.id, f"Error: {str(e)}")
                      
 @bot.message_handler(content_types=['document'])
+@check_membership
 def handle_file(message):
     user_id = message.chat.id
 
