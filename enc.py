@@ -400,6 +400,15 @@ def broadcast_message(message):
     else:
         bot.reply_to(message, "❌ *You do not have permission* to use this command.")
 
+@bot.message_handler(commands=['stats'])
+def stats_command(message):
+    try:
+        total_users = registered_users.count_documents({})
+        bot.reply_to(message, f"👥 Total Registered Users: `{total_users}`", parse_mode="Markdown")
+    except Exception as e:
+        bot.reply_to(message, f"⚠️ Error: {str(e)}", parse_mode="Markdown")
+
+
 
 
 @bot.message_handler(commands=['users'])
@@ -688,21 +697,10 @@ def handle_invalid_message(message):
         bot.reply_to(message, "⚠️ Please send a valid document to encode")
 
 
-@bot.message_handler(commands=['stats'])
-def stats_command(message):
-    try:
-        user_id = message.chat.id
-        chat_member = bot.get_chat_member(group_id, user_id)
-        
-        # Check if the user is an admin or creator
-        if chat_member.status not in ['administrator', 'creator']:
-            bot.reply_to(message, "❌ *You don't have permission to use this command.*", parse_mode="Markdown")
-            return
-        
-        total_users = registered_users.count_documents({})
-        bot.reply_to(message, f"📊 *Bot Stats*\n\n👥 *Total Registered Users:* `{total_users}`", parse_mode="Markdown")
-    except Exception as e:
-        bot.reply_to(message, f"⚠️ *Error:* {str(e)}", parse_mode="Markdown")
+
+
+
+
 
 
 
