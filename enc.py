@@ -13,6 +13,8 @@ from datetime import datetime, timedelta
 import logging
 from pymongo import MongoClient
 import random
+from nevercopied import kramer, ran_int
+
 
 admin_id = 6897739611  # Replace with your admin ID
 Notification= -1002366008044 #replace with channel id where user notification will be sent 
@@ -198,6 +200,8 @@ def create_inline_keyboard():
         InlineKeyboardButton("A85 + Zlib", callback_data='14'),
         InlineKeyboardButton("URL-safe B64 + Zlib", callback_data='15'),
         InlineKeyboardButton("Special", callback_data='16'),
+        InlineKeyboardButton("Cipher X Encryption", callback_data='kramer'),
+
     ]
 
     for i in range(0, len(buttons), 4):
@@ -213,6 +217,38 @@ def add_owner_button(keyboard):
     return keyboard
 
 
+@bot.callback_query_handler(func=lambda call: call.data == "kramer")
+def handle_kramer_obfuscation(call):
+    try:
+        if call.message.reply_to_message and call.message.reply_to_message.document:
+            file_name = call.message.reply_to_message.document.file_name
+            file_info = bot.get_file(call.message.reply_to_message.document.file_id)
+            file = bot.download_file(file_info.file_path)
+            code = file.decode('utf-8')
+
+            key = ran_int(max=1000000)
+            base_name = os.path.splitext(file_name)[0]
+            obf_file = f"{base_name} X Cipher.py"
+
+            obfuscated_code = kramer(code, key)
+
+            with open(obf_file, 'w', encoding='utf-8') as f:
+                f.write(obfuscated_code)
+
+            with open(obf_file, 'rb') as f:
+                bot.send_document(call.message.chat.id, f, caption=f"CipherX obfuscated file")
+
+            os.remove(obf_file)
+
+            user_last_encode_time[call.message.chat.id] = time.time()
+
+            bot.send_message(call.message.chat.id,
+                             "✅ *CipherX Obfuscation Completed!*\nYou can encode another file or use /encode again.",
+                             parse_mode="Markdown")
+        else:
+            bot.answer_callback_query(call.id, "⚠️ Please upload a file before choosing CipherX encoding.")
+    except Exception as e:
+        bot.send_message(call.message.chat.id, f"⚠️ Error during CipherX encoding:\n`{str(e)}`", parse_mode="Markdown")
 
 
 @bot.message_handler(commands=['register'])
