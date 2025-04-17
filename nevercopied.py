@@ -125,7 +125,7 @@ def kramer(content: str, key: int) -> str:
 Hyponet(_n1_=False,_n2_=False,_sparkle='''{content}''')""".strip().replace("_n1_",n_1.removeprefix("self.")).replace("_n2_",n_2.removeprefix("self.")).replace("_n3_",n_3.removeprefix("self.")).replace("_n4_",n_4.removeprefix("self.")).replace("_n5_",n_5).replace("_n6_",n_6).replace("_n7_",n_7).replace("_n8_",n_8).replace("_n9_",n_9.removeprefix("self.")).replace("_n10_",n_10.removeprefix("self.")).replace("_n12_",n_12.removeprefix("self."))
 
     # Include the design code in the final content at the top
-    final_output = design_code + "\n" + _final_content_
+    final_output = _final_content_
 
     return final_output
 
