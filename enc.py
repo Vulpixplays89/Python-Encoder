@@ -356,49 +356,50 @@ def start_command(message):
 @bot.message_handler(commands=['broad'])
 def broadcast_message(message):
     user_id = message.from_user.id
-    chat_member = bot.get_chat_member(group_id, user_id)
 
-    # Check if the user is an admin or creator
-    if chat_member.status in ['administrator', 'creator']:
-        # Extract the message content (after the command)
-        broadcast_text = message.text[len("/broad "):].strip()
-
-        # Check if there's any text after the command
-        if not broadcast_text:
-            bot.reply_to(message, "🚫 Please provide a message to broadcast.")
+    # Check if the user is admin
+    try:
+        chat_member = bot.get_chat_member(group_id, user_id)
+        if chat_member.status not in ['administrator', 'creator']:
+            bot.reply_to(message, "❌ *You do not have permission* to use this command.", parse_mode="Markdown")
             return
+    except Exception as e:
+        bot.reply_to(message, "❌ Unable to verify your admin status.")
+        return
 
-        user_count = registered_users.count_documents({})
-        if user_count == 0:
-            bot.reply_to(message, "🚫 No registered users found to send the broadcast.")
-            return
+    # Make sure it's a reply
+    if not message.reply_to_message:
+        bot.reply_to(message, "⚠️ Please reply to the message you want to broadcast with /broad")
+        return
 
-        # Prepare to send the broadcast message to all users
-        sent_count = 0
-        failed_count = 0
-        failed_users = []
+    user_count = registered_users.count_documents({})
+    if user_count == 0:
+        bot.reply_to(message, "🚫 No registered users found to send the broadcast.")
+        return
 
-        # Send the broadcast message to all registered users
-        user_list = registered_users.find()
-        for user in user_list:
-            user_id = user.get("user_id")
-            try:
-                bot.send_message(user_id, broadcast_text)
-                sent_count += 1
-            except Exception as e:
-                failed_count += 1
-                failed_users.append(user_id)
+    sent_count = 0
+    failed_count = 0
+    failed_users = []
 
-        # Send a summary message after broadcasting
-        summary_message = f"📢 *Broadcast Summary*:\n"
-        summary_message += f"✅ *Successfully sent to {sent_count} users.*\n"
-        summary_message += f"❌ *Failed to send to {failed_count} users.*\n"
+    user_list = registered_users.find()
+    for user in user_list:
+        user_id = user.get("user_id")
+        try:
+            # Copy the replied message to each user (preserving formatting/media)
+            bot.copy_message(chat_id=user_id,
+                             from_chat_id=message.chat.id,
+                             message_id=message.reply_to_message.message_id)
+            sent_count += 1
+        except Exception:
+            failed_count += 1
+            failed_users.append(user_id)
 
-
-        bot.send_message(message.chat.id, summary_message, parse_mode="Markdown")
-
-    else:
-        bot.reply_to(message, "❌ *You do not have permission* to use this command.")
+    summary_message = (
+        f"📢 *Broadcast Summary*:\n"
+        f"✅ *Successfully sent to {sent_count} users.*\n"
+        f"❌ *Failed to send to {failed_count} users.*"
+    )
+    bot.send_message(chat_id=message.chat.id, text=summary_message, parse_mode="Markdown")
 
 @bot.message_handler(commands=['stats'])
 def stats_command(message):
