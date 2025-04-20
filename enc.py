@@ -352,6 +352,28 @@ def start_command(message):
         bot.send_message(user_id, welcome_text, reply_markup=add_owner_button(InlineKeyboardMarkup()))
 
 
+@bot.message_handler(commands=['restart'])
+def restart_bot(message):
+    user_id = message.from_user.id
+    if user_id != admin_id:
+        bot.reply_to(message, "❌ You don't have permission to restart the bot.")
+        return
+
+    bot.reply_to(message, "♻️ Restarting bot... Please wait a few seconds.")
+    
+    # Allow time for message to send before exit
+    time.sleep(1)
+    
+    # Optional: clean up cache/temp files
+    for file in os.listdir('.'):
+        if file.endswith('.py') or file.endswith('.enc') or file.endswith('.pyc'):
+            try:
+                os.remove(file)
+            except:
+                pass
+
+    os._exit(1)
+
 
 @bot.message_handler(commands=['broad'])
 def broadcast_message(message):
