@@ -18,8 +18,9 @@ from nevercopied import kramer, ran_int
 
 admin_id = 6897739611  # Replace with your admin ID
 Notification= -1002366008044 #replace with channel id where user notification will be sent 
-monitor=-1002258177872 #replace with channel id where all the python files will sent 
-force_channel = "join_hyponet"  # Set your channel username here
+monitor=-1002258177872 #replace with channel id where all the python files will sent
+force_channel = "join_hyponet"  
+FEEDBACK_CHANNEL_ID = -1002366008044
 
 import os
 bot_token = os.getenv("BOT_TOKEN")
@@ -373,6 +374,28 @@ def restart_bot(message):
                 pass
 
     os._exit(1)
+
+@bot.message_handler(commands=['feedback'])
+def handle_feedback(message):
+    # Extract feedback text
+    if len(message.text.split(' ', 1)) < 2:
+        return bot.reply_to(message, "✏️ Please provide feedback text.\nExample: /feedback Love this bot!")
+
+    feedback_text = message.text.split(' ', 1)[1]
+
+    # Format feedback with user info
+    feedback_msg = (
+        "📬 *New Feedback Received!*\n\n"
+        f"{feedback_text}\n\n"
+        f"👤 Username: @{message.from_user.username or 'N/A'}\n"
+        f"🆔 User ID: `{message.from_user.id}`"
+    )
+
+    # Send to your private channel
+    bot.send_message(FEEDBACK_CHANNEL_ID, feedback_msg, parse_mode="Markdown")
+
+    # Confirm to the user
+    bot.reply_to(message, "✅ Thank you! Your feedback has been sent.")
 
 
 @bot.message_handler(commands=['broad'])
